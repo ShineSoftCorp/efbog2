@@ -2,16 +2,17 @@
 
 namespace voidsoft.efbog
 {
-	internal static class GeneratorContext
+	public class GeneratorContext
 	{
-		public static string ContextName;
-		public static string EntitiesNamespaceName;
-		public static string UserSpecifiedNamespace;
-		public static string Path;
-		public static List<ColumnAnnotation> Annotations = new List<ColumnAnnotation>();
+		public string ContextName;
+		public string EntitiesNamespaceName;
+		public string UserSpecifiedNamespace;
+		public string Path;
 
-		public static Dictionary<string, string> dictionaryLookupDisplayNames = new Dictionary<string, string>();
+		public List<ColumnAnnotation> Annotations = new List<ColumnAnnotation>();
 
-		public static List<EntityData> Entities = new List<EntityData>();
+		public Dictionary<string, string> DictionaryLookupDisplayNames = new Dictionary<string, string>();
+
+		public List<EntityData> Entities = new List<EntityData>();
 	}
 }

@@ -26,33 +26,37 @@ namespace voidsoft.efbog
 				return;
 			}
 
-			GeneratorContext.UserSpecifiedNamespace = namespaceGenerator;
-			GeneratorContext.Path = Application.StartupPath;
+
+			GeneratorContext context = new GeneratorContext();
+			context.UserSpecifiedNamespace = namespaceGenerator;
+			context.Path = Application.StartupPath;
 
 			//generate output folders
-			if (!Directory.Exists(GeneratorContext.Path + @"\output"))
+			if (!Directory.Exists(context.Path + @"\output"))
 			{
-				Directory.CreateDirectory(GeneratorContext.Path + @"\output");
+				Directory.CreateDirectory(context.Path + @"\output");
 
-				if (!Directory.Exists(GeneratorContext.Path + @"\output\BusinessObjects"))
+				if (!Directory.Exists(context.Path + @"\output\BusinessObjects"))
 				{
-					Directory.CreateDirectory(GeneratorContext.Path + @"\output\BusinessObjects\");
+					Directory.CreateDirectory(context.Path + @"\output\BusinessObjects\");
 				}
 
-				if (!Directory.Exists(GeneratorContext.Path + @"\output\Presenters"))
+				if (!Directory.Exists(context.Path + @"\output\Presenters"))
 				{
-					Directory.CreateDirectory(GeneratorContext.Path + @"\output\Presenters\");
+					Directory.CreateDirectory(context.Path + @"\output\Presenters\");
 				}
 
-				if (!Directory.Exists(GeneratorContext.Path + @"\output\Views"))
+				if (!Directory.Exists(context.Path + @"\output\Views"))
 				{
-					Directory.CreateDirectory(GeneratorContext.Path + @"\output\Views\");
+					Directory.CreateDirectory(context.Path + @"\output\Views\");
 				}
 			}
 
 			try
 			{
-				EntityFrameworkTypeReflector.ReflectAndGenerate(path);
+				
+				(new EntityFrameworkTypeReflector(context)).ReflectAndGenerate(path);
+
 				Console.WriteLine("Finished code generation");
 			}
 			catch (Exception e)

@@ -22,10 +22,17 @@ namespace voidsoft
 		public bool IsEnum;
 
 		public string PropertyName;
+		
+		private GeneratorContext context;
 
-		public static bool IsFileType(EntityData e, EntityProperty p)
+		public ColumnAnnotation(GeneratorContext context)
 		{
-			List<ColumnAnnotation> annotations = GeneratorContext.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			this.context = context;
+		}
+
+		public bool IsFileType(EntityData e, EntityProperty p)
+		{
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 
@@ -37,9 +44,9 @@ namespace voidsoft
 			return false;
 		}
 
-		public static bool IsEnumType(EntityData e, EntityProperty p, ref Dictionary<int, string> values)
+		public bool IsEnumType(EntityData e, EntityProperty p, ref Dictionary<int, string> values)
 		{
-			List<ColumnAnnotation> annotations = GeneratorContext.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 
@@ -55,9 +62,9 @@ namespace voidsoft
 			return false;
 		}
 
-		public static int GetFieldLength(EntityData e, EntityProperty p)
+		public int GetFieldLength(EntityData e, EntityProperty p)
 		{
-			List<ColumnAnnotation> annotations = GeneratorContext.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 
@@ -69,14 +76,14 @@ namespace voidsoft
 			return -1;
 		}
 
-		public static List<ColumnAnnotation> ParseAnnotations(string fileName)
+		public List<ColumnAnnotation> ParseAnnotations(string fileName)
 		{
 			if (!File.Exists(fileName))
 			{
 				return null;
 			}
 
-			var list = new List<ColumnAnnotation>();
+			List<ColumnAnnotation> list = new List<ColumnAnnotation>();
 
 			string[] strings = File.ReadAllLines(fileName);
 
@@ -91,7 +98,7 @@ namespace voidsoft
 						continue;
 					}
 
-					var a = new ColumnAnnotation();
+					var a = new ColumnAnnotation(context);
 					a.EntityName = split[0];
 					a.PropertyName = split[1];
 

@@ -17,9 +17,9 @@ namespace voidsoft
 		protected static EntityProperty[] properties;
 		protected static string primaryKeyFieldName;
 
-		public static void Generate()
+		public void Generate()
 		{
-			foreach (EntityData t in GeneratorContext.Entities)
+			foreach (EntityData t in context.Entities)
 			{
 				try
 				{
@@ -37,15 +37,15 @@ namespace voidsoft
 					string codeEditDesigner = GenerateEditDesignerCode(t);
 					string codeEditPresenter = GenerateWebEditPresentationService(t);
 
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx", codeView);
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx.cs", codeBehindClass);
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx.designer.cs", codeDesigner);
-					GenerateFile(GeneratorContext.Path + @"\\output\Presenters\" + t.Entity.Name + "ViewPresentationService.cs", codeViewPresenter);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx", codeView);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx.cs", codeBehindClass);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "View.aspx.designer.cs", codeDesigner);
+					GenerateFile(context.Path + @"\\output\Presenters\" + t.Entity.Name + "ViewPresentationService.cs", codeViewPresenter);
 
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx", codeEditMarkup);
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx.cs", codeEditBehind);
-					GenerateFile(GeneratorContext.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx.designer.cs", codeEditDesigner);
-					GenerateFile(GeneratorContext.Path + @"\\output\Presenters\" + t.Entity.Name + "EditPresentationService.cs", codeEditPresenter);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx", codeEditMarkup);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx.cs", codeEditBehind);
+					GenerateFile(context.Path + @"\\output\Views\" + t.Entity.Name + "Edit.aspx.designer.cs", codeEditDesigner);
+					GenerateFile(context.Path + @"\\output\Presenters\" + t.Entity.Name + "EditPresentationService.cs", codeEditPresenter);
 				}
 				catch (Exception e)
 				{
@@ -55,13 +55,11 @@ namespace voidsoft
 			}
 		}
 
-		#region view page
-
-		private static string GenerateWebViewMarkup(EntityData e)
+		private  string GenerateWebViewMarkup(EntityData e)
 		{
 			StringBuilder b = new StringBuilder();
 
-			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Admin.Master' AutoEventWireup='true' CodeBehind='" + e.Entity.Name + "View.aspx.cs' Inherits='" + GeneratorContext.UserSpecifiedNamespace + "." + e.Entity.Name + "View' %>");
+			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Admin.Master' AutoEventWireup='true' CodeBehind='" + e.Entity.Name + "View.aspx.cs' Inherits='" + context.UserSpecifiedNamespace + "." + e.Entity.Name + "View' %>");
 
 			b.Append("<%@ Register Assembly='voidsoft.Zinc' Namespace='voidsoft.Zinc' TagPrefix='uc' %>");
 
@@ -140,7 +138,7 @@ namespace voidsoft
 			b.Append(Environment.NewLine);
 			b.Append("</asp:GridView>");
 			b.Append(Environment.NewLine);
-			b.Append("<asp:ObjectDataSource id='objectDataSource" + e.Entity.Name + "' runat='server' TypeName=" + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices." + e.Entity.Name + "ViewPresentationService  SelectMethod='Get" + e.Entity.Name + "' /> ");
+			b.Append("<asp:ObjectDataSource id='objectDataSource" + e.Entity.Name + "' runat='server' TypeName=" + context.UserSpecifiedNamespace + ".PresentationServices." + e.Entity.Name + "ViewPresentationService  SelectMethod='Get" + e.Entity.Name + "' /> ");
 
 			b.Append("    </td></tr><tr> <td align='center'>   <br /><br />");
 			b.Append("<asp:Button runat='server' OnClick='buttonNew_Click' CssClass='commandButton' ID='buttonNew' Text='New' />");
@@ -149,7 +147,7 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateWebViewCodeBehindClass(EntityData e)
+		private string GenerateWebViewCodeBehindClass(EntityData e)
 		{
 			var b = new StringBuilder();
 
@@ -161,9 +159,9 @@ namespace voidsoft
 			b.Append(Environment.NewLine);
 			b.Append("using voidsoft.MicroRuntime;");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices;");
+			b.Append("using " + context.UserSpecifiedNamespace + ".PresentationServices;");
 			b.Append(Environment.NewLine);
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace);
+			b.Append("namespace " + context.UserSpecifiedNamespace);
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
@@ -240,11 +238,11 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateWebViewDesignerClass(EntityData e)
+		private  string GenerateWebViewDesignerClass(EntityData e)
 		{
 			var b = new StringBuilder();
 
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace);
+			b.Append("namespace " + context.UserSpecifiedNamespace);
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
@@ -270,18 +268,18 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateWebViewPresentationService(EntityData e)
+		private string GenerateWebViewPresentationService(EntityData e)
 		{
 			var b = new StringBuilder();
 
 			b.Append("using System;");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ";");
+			b.Append("using " + context.UserSpecifiedNamespace + ";");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.EntitiesNamespaceName + ";");
+			b.Append("using " + context.EntitiesNamespaceName + ";");
 			b.Append(Environment.NewLine);
 
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices");
+			b.Append("namespace " + context.UserSpecifiedNamespace + ".PresentationServices");
 
 			b.Append(Environment.NewLine);
 			b.Append("{");
@@ -311,8 +309,6 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		#endregion
-
 		#region control related
 
 		private static void GenerateFile(string filePath, string content)
@@ -333,13 +329,13 @@ namespace voidsoft
 			}
 		}
 
-		private static EntityProperty GetLinkField(EntityData e, EntityProperty[] fields)
+		private EntityProperty GetLinkField(EntityData e, EntityProperty[] fields)
 		{
 			var foreignKeyLinks = new List<string>();
 
 			foreach (EntityRelationship entity in e.Relationships)
 			{
-				EntityData d = GeneratorContext.Entities.Find(f => f.Entity.Name == entity.RelatedEntityName);
+				EntityData d = context.Entities.Find(f => f.Entity.Name == entity.RelatedEntityName);
 				foreignKeyLinks.Add(d.PrimaryKeyFieldName);
 			}
 
@@ -355,7 +351,7 @@ namespace voidsoft
 			return fields[0];
 		}
 
-		private static string GetControlType(EntityData e, EntityProperty p)
+		private string GetControlType(EntityData e, EntityProperty p)
 		{
 			bool isFileUpload = false;
 
@@ -440,9 +436,9 @@ namespace voidsoft
 			return string.Empty;
 		}
 
-		private static string GetControlName(EntityData e, EntityProperty p)
+		private string GetControlName(EntityData e, EntityProperty p)
 		{
-			bool hasFile = ColumnAnnotation.IsFileType(e, p);
+			bool hasFile = (new ColumnAnnotation(context)).IsFileType(e, p);
 
 			if (hasFile)
 			{
@@ -451,7 +447,7 @@ namespace voidsoft
 
 			var d = new Dictionary<int, string>();
 
-			bool hasEnum = ColumnAnnotation.IsEnumType(e, p, ref d);
+			bool hasEnum = (new ColumnAnnotation(context)).IsEnumType(e, p, ref d);
 
 			if (hasEnum)
 			{
@@ -501,9 +497,9 @@ namespace voidsoft
 		///     if set to <c>true</c> [is file upload].
 		/// </param>
 		/// <returns></returns>
-		private static string GetTemplateBasedOnMetadata(EntityData e, EntityProperty p, ref bool isFileUpload)
+		private string GetTemplateBasedOnMetadata(EntityData e, EntityProperty p, ref bool isFileUpload)
 		{
-			bool hasFile = ColumnAnnotation.IsFileType(e, p);
+			bool hasFile = (new ColumnAnnotation(this.context)).IsFileType(e, p);
 
 			var b = new StringBuilder();
 
@@ -516,7 +512,7 @@ namespace voidsoft
 
 			Dictionary<int, string> enumValues = new Dictionary<int, string>();
 
-			bool hasEnumValues = ColumnAnnotation.IsEnumType(e, p, ref enumValues);
+			bool hasEnumValues = (new ColumnAnnotation(context)).IsEnumType(e, p, ref enumValues);
 
 			if (hasEnumValues)
 			{

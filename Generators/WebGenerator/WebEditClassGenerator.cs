@@ -11,11 +11,18 @@ namespace voidsoft
 		private const int TEXT_FIELD_MAX_LENGTH = 300;
 		private const int DEFAULT_VALUE_FOR_MULTILINE_TEXT = 500;
 
-		public static string GenerateWebEditMarkup(EntityData e)
+		private GeneratorContext context;
+
+		public WebClassGenerator(GeneratorContext ctx)
+		{
+			context = ctx;
+		}
+
+		public string GenerateWebEditMarkup(EntityData e)
 		{
 			var b = new StringBuilder();
 
-			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Admin.Master' AutoEventWireup='true' CodeBehind='" + e.Entity.Name + "Edit.aspx.cs' Inherits='" + GeneratorContext.UserSpecifiedNamespace + "." + e.Entity.Name + "Edit' %>");
+			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Admin.Master' AutoEventWireup='true' CodeBehind='" + e.Entity.Name + "Edit.aspx.cs' Inherits='" + context.UserSpecifiedNamespace + "." + e.Entity.Name + "Edit' %>");
 			b.Append(Environment.NewLine);
 			b.Append("<asp:Content ID='content' ContentPlaceHolderID='contentPlaceHolder' runat='server'>");
 			b.Append(Environment.NewLine);
@@ -60,11 +67,11 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		public static string GenerateEditDesignerCode(EntityData e)
+		public string GenerateEditDesignerCode(EntityData e)
 		{
 			var b = new StringBuilder();
 
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace);
+			b.Append("namespace " + context.UserSpecifiedNamespace);
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
@@ -109,7 +116,7 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		public static string GenerateEditCodeBehindClass(EntityData e)
+		public string GenerateEditCodeBehindClass(EntityData e)
 		{
 			var b = new StringBuilder();
 
@@ -125,13 +132,13 @@ namespace voidsoft
 			b.Append(Environment.NewLine);
 			b.Append("using voidsoft.Zinc;");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ";");
+			b.Append("using " + context.UserSpecifiedNamespace + ";");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.EntitiesNamespaceName + ";");
+			b.Append("using " + context.EntitiesNamespaceName + ";");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices;");
+			b.Append("using " + context.UserSpecifiedNamespace + ".PresentationServices;");
 			b.Append(Environment.NewLine);
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace);
+			b.Append("namespace " + context.UserSpecifiedNamespace);
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
@@ -196,6 +203,8 @@ namespace voidsoft
 			b.Append("    labelTitle.Text =" + Constants.QUOTE + " Edit " + e.Entity.Name + Constants.QUOTE + ";");
 			b.Append(Environment.NewLine);
 
+			ColumnAnnotation ca = new ColumnAnnotation(this.context);
+
 			foreach (EntityProperty p in properties)
 			{
 				if (p.IsPrimaryKey)
@@ -227,7 +236,7 @@ namespace voidsoft
 				}
 				else
 				{
-					if (ColumnAnnotation.IsFileType(e, p))
+					if (ca.IsFileType(e, p))
 					{
 						continue;
 					}
@@ -350,7 +359,7 @@ namespace voidsoft
 				else
 				{
 					//
-					bool isFileType = ColumnAnnotation.IsFileType(e, p);
+					bool isFileType = (new ColumnAnnotation(this.context)).IsFileType(e, p);
 
 					if (isFileType)
 					{
@@ -372,7 +381,7 @@ namespace voidsoft
 
 			foreach (EntityRelationship r in relations)
 			{
-				b.Append("entity." + r.RelatedEntityName + "Reference.EntityKey = new EntityKey(" + Constants.QUOTE + GeneratorContext.ContextName + "." + r.RelatedEntityName + Constants.QUOTE + "," + Constants.QUOTE + r.RelatedEntityPrimaryKey + Constants.QUOTE + "," + " Convert.ToInt32(dropDown" + r.RelatedEntityName + ".SelectedValue));");
+				b.Append("entity." + r.RelatedEntityName + "Reference.EntityKey = new EntityKey(" + Constants.QUOTE + context.ContextName + "." + r.RelatedEntityName + Constants.QUOTE + "," + Constants.QUOTE + r.RelatedEntityPrimaryKey + Constants.QUOTE + "," + " Convert.ToInt32(dropDown" + r.RelatedEntityName + ".SelectedValue));");
 
 				b.Append(Environment.NewLine);
 			}
@@ -406,20 +415,20 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateWebEditPresentationService(EntityData e)
+		private  string GenerateWebEditPresentationService(EntityData e)
 		{
-			var b = new StringBuilder();
+			StringBuilder b = new StringBuilder();
 
 			b.Append("using System;");
 			b.Append(Environment.NewLine);
 			b.Append("using System.Collections.Generic;");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ";");
+			b.Append("using " + context.UserSpecifiedNamespace + ";");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.EntitiesNamespaceName + ";");
+			b.Append("using " + context.EntitiesNamespaceName + ";");
 			b.Append(Environment.NewLine);
 
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices");
+			b.Append("namespace " + context.UserSpecifiedNamespace + ".PresentationServices");
 
 			b.Append(Environment.NewLine);
 			b.Append("{");
@@ -477,7 +486,7 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateMarkupForRelations(EntityData e)
+		private string GenerateMarkupForRelations(EntityData e)
 		{
 			var fkBuilder = new StringBuilder();
 			//check for FK relationships
@@ -495,7 +504,7 @@ namespace voidsoft
 					fkBuilder.Append(Environment.NewLine);
 					fkBuilder.Append("<br/>");
 					fkBuilder.Append(Environment.NewLine);
-					fkBuilder.Append("<asp:ObjectDataSource runat='server' id='objectSource" + r.RelatedEntityName + "' TypeName='" + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices." + e.Entity.Name + "EditPresentationService' SelectMethod='GetLookupDataFor" + r.RelatedEntityName + "' ></asp:ObjectDataSource>");
+					fkBuilder.Append("<asp:ObjectDataSource runat='server' id='objectSource" + r.RelatedEntityName + "' TypeName='" + context.UserSpecifiedNamespace + ".PresentationServices." + e.Entity.Name + "EditPresentationService' SelectMethod='GetLookupDataFor" + r.RelatedEntityName + "' ></asp:ObjectDataSource>");
 					fkBuilder.Append(Environment.NewLine);
 					fkBuilder.Append("</td></tr>");
 				}
@@ -504,9 +513,9 @@ namespace voidsoft
 			return fkBuilder.ToString();
 		}
 
-		private static string GetMarkupForEdit(EntityData e, EntityProperty p)
+		private string GetMarkupForEdit(EntityData e, EntityProperty p)
 		{
-			var b = new StringBuilder();
+			StringBuilder b = new StringBuilder();
 
 			bool isFileUploadcontrol = false;
 			string metadataBased = GetTemplateBasedOnMetadata(e, p, ref isFileUploadcontrol);
@@ -521,7 +530,7 @@ namespace voidsoft
 				case DbType.AnsiStringFixedLength:
 				case DbType.String:
 
-					int size = ColumnAnnotation.GetFieldLength(e, p);
+					int size = (new ColumnAnnotation(context)).GetFieldLength(e, p);
 
 					b.Append("<asp:TextBox runat='server'  SkinId='textBoxSkin' id='" + GetControlName(e, p) + "'"); //" />");
 
@@ -581,7 +590,7 @@ namespace voidsoft
 			return b.ToString();
 		}
 
-		private static string GenerateEmptyCheck(EntityData e, EntityProperty p)
+		private string GenerateEmptyCheck(EntityData e, EntityProperty p)
 		{
 			switch (p.PropertyType)
 			{
@@ -604,7 +613,7 @@ namespace voidsoft
 			return string.Empty;
 		}
 
-		private static string GenerateConversionForReading(EntityProperty e, ref bool hasConversion)
+		private string GenerateConversionForReading(EntityProperty e, ref bool hasConversion)
 		{
 			switch (e.PropertyType)
 			{

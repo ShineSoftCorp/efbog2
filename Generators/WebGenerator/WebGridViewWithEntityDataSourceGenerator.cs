@@ -7,14 +7,22 @@ namespace voidsoft.Generators
 {
 	public class WebGridViewWithEntityDataSourceGenerator
 	{
-		public static void Generate()
+
+		private GeneratorContext context;
+
+		public WebGridViewWithEntityDataSourceGenerator(GeneratorContext ctx)
 		{
-			foreach (EntityData t in GeneratorContext.Entities)
+			context = ctx;
+		}
+
+		public void Generate()
+		{
+			foreach (EntityData t in context.Entities)
 			{
 				try
 				{
 					string codeView = GenerateMarkup(t);
-					GenerateFile(GeneratorContext.Path + @"\\output\views\" + t.Entity.Name + "ViewES.aspx", codeView);
+					GenerateFile(context.Path + @"\\output\views\" + t.Entity.Name + "ViewES.aspx", codeView);
 				}
 				catch (Exception e)
 				{
@@ -24,7 +32,7 @@ namespace voidsoft.Generators
 			}
 		}
 
-		private static string GenerateMarkup(EntityData data)
+		private string GenerateMarkup(EntityData data)
 		{
 			StringBuilder b = new StringBuilder();
 
@@ -32,7 +40,7 @@ namespace voidsoft.Generators
 
 			string primaryKeyFieldName = EntityFrameworkTypeReflector.GetPrimaryKeyName(data.Entity);
 
-			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Master.Master' AutoEventWireup='true' CodeBehind='" + data.Entity.Name + "View.aspx.cs' Inherits='" + GeneratorContext.UserSpecifiedNamespace + "." + data.Entity.Name + "View' %>");
+			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Master.Master' AutoEventWireup='true' CodeBehind='" + data.Entity.Name + "View.aspx.cs' Inherits='" + context.UserSpecifiedNamespace + "." + data.Entity.Name + "View' %>");
 
 			b.Append(Environment.NewLine);
 			b.Append("<asp:Content ID='content' ContentPlaceHolderID='contentPlaceholder' runat='server'>");
@@ -63,7 +71,7 @@ namespace voidsoft.Generators
 
 			b.Append(" </Columns></asp:GridView>");
 			b.Append(Environment.NewLine);
-			b.Append("<asp:EntityDataSource ID=" + Constants.QUOTE + "entityDataSource" + data.Entity.Name + Constants.QUOTE + " runat='server' " + "ConnectionString=" + Constants.QUOTE + "name=" + GeneratorContext.ContextName + Constants.QUOTE + " DefaultContainerName='" + GeneratorContext.ContextName + "' " + " EntitySetName='" + data.Entity.Name + "' " + " Select='");
+			b.Append("<asp:EntityDataSource ID=" + Constants.QUOTE + "entityDataSource" + data.Entity.Name + Constants.QUOTE + " runat='server' " + "ConnectionString=" + Constants.QUOTE + "name=" + context.ContextName + Constants.QUOTE + " DefaultContainerName='" + context.ContextName + "' " + " EntitySetName='" + data.Entity.Name + "' " + " Select='");
 
 			//generate the select for entity data source
 			var builder = new StringBuilder();
@@ -87,7 +95,7 @@ namespace voidsoft.Generators
 			return b.ToString();
 		}
 
-		private static string GenerateWebViewCodeBehindClass(EntityData e)
+		private string GenerateWebViewCodeBehindClass(EntityData e)
 		{
 			var b = new StringBuilder();
 
@@ -99,9 +107,9 @@ namespace voidsoft.Generators
 			b.Append(Environment.NewLine);
 			b.Append("using voidsoft.MicroRuntime;");
 			b.Append(Environment.NewLine);
-			b.Append("using " + GeneratorContext.UserSpecifiedNamespace + ".PresentationServices;");
+			b.Append("using " + context.UserSpecifiedNamespace + ".PresentationServices;");
 			b.Append(Environment.NewLine);
-			b.Append("namespace " + GeneratorContext.UserSpecifiedNamespace);
+			b.Append("namespace " + context.UserSpecifiedNamespace);
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);

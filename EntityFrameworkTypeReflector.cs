@@ -11,8 +11,14 @@ namespace voidsoft.efbog
 	{
 		private static EdmRelationshipAttribute[] relationshipAttributes;
 
+		private GeneratorContext context;
 
-		public static void ReflectAndGenerate(string assemblyPath)
+		public EntityFrameworkTypeReflector(GeneratorContext c)
+		{
+			context = c;
+		}
+
+		public void ReflectAndGenerate(string assemblyPath)
 		{
 			Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
@@ -29,15 +35,16 @@ namespace voidsoft.efbog
 			GetEntities(types, assembly);
 
 			//load additional annotations
-			List<ColumnAnnotation> annotations = ColumnAnnotation.ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
+			List<ColumnAnnotation> annotations = (new ColumnAnnotation(context)).ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
 
 			if (annotations != null)
 			{
-				GeneratorContext.Annotations = annotations;
+				context.Annotations = annotations;
 			}
 
 			StartGenerationProcess();
 		}
+
 
 		public static EntityProperty[] GetProperties(Type tp)
 		{
@@ -75,20 +82,20 @@ namespace voidsoft.efbog
 			throw new ArgumentException("The primary key field can't be found for entity " + tp.Name);
 		}
 
-		private static void StartGenerationProcess()
+		private void StartGenerationProcess()
 		{
-			BusinessObjectGenerator.Generate();
+			(new BusinessObjectGenerator(this.context)).Generate();
 
 			//generate WebViews
-			WebClassGenerator.Generate();
+			(new WebClassGenerator(this.context)).Generate();
 
 			//WebGridViewWithEntityDataSourceGenerator.Generate();
 		}
 
-		private static void GetEntities(IEnumerable<Type> types, Assembly assembly)
+		private void GetEntities(IEnumerable<Type> types, Assembly assembly)
 		{
 			//try to find the types by going over the DbContext porperties
-			Type type = assembly.GetType(GeneratorContext.EntitiesNamespaceName + "." + GeneratorContext.ContextName, true, true);
+			Type type = assembly.GetType(context.EntitiesNamespaceName + "." + context.ContextName, true, true);
 
 			PropertyInfo[] properties = type.GetProperties();
 
@@ -141,12 +148,12 @@ namespace voidsoft.efbog
 				}
 			}
 
-			GeneratorContext.Entities = listFinal;
+			context.Entities = listFinal;
 		}
 
 
 
-		private static bool GetDbContext(Type[] types)
+		private bool GetDbContext(Type[] types)
 		{
 			foreach (Type type in types)
 			{
@@ -160,12 +167,12 @@ namespace voidsoft.efbog
 					continue;
 				}
 
-				GeneratorContext.ContextName = type.Name;
-				GeneratorContext.EntitiesNamespaceName = type.Namespace;
+				context.ContextName = type.Name;
+				context.EntitiesNamespaceName = type.Namespace;
 				break;
 			}
 
-			if (string.IsNullOrEmpty(GeneratorContext.ContextName))
+			if (string.IsNullOrEmpty(context.ContextName))
 			{
 				Console.WriteLine("Can't find the DbContext");
 				return false;

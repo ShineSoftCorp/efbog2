@@ -11,21 +11,21 @@ namespace voidsoft
 
 	public class OptionLoader
 	{
-		public static void LoadOptions(string fileName)
-		{
-			string[] lines = File.ReadAllLines(fileName);
+		//public static void LoadOptions(string fileName)
+		//{
+		//	string[] lines = File.ReadAllLines(fileName);
 
-			foreach (string s in lines)
-			{
-				string[] parts = s.Split('=');
+		//	foreach (string s in lines)
+		//	{
+		//		string[] parts = s.Split('=');
 
-				if (parts.Length != 2)
-				{
-					continue;
-				}
+		//		if (parts.Length != 2)
+		//		{
+		//			continue;
+		//		}
 
-				GeneratorContext.dictionaryLookupDisplayNames.Add(parts[0], parts[1]);
-			}
-		}
+		//		GeneratorContext.dictionaryLookupDisplayNames.Add(parts[0], parts[1]);
+		//	}
+		//}
 	}
 }
