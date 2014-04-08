@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects.DataClasses;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace voidsoft.efbog
 {
 	public class EntityFrameworkTypeReflector
 	{
-		private static EdmRelationshipAttribute[] relationshipAttributes;
+		private EdmRelationshipAttribute[] relationshipAttributes;
 
 		private GeneratorContext context;
 
@@ -34,6 +37,12 @@ namespace voidsoft.efbog
 
 			GetEntities(types, assembly);
 
+			//get the resources
+
+			Schema sc = ReadEntityMetadata(assembly);
+
+			context.DbContextSchema = sc;
+
 			//load additional annotations
 			List<ColumnAnnotation> annotations = (new ColumnAnnotation(context)).ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
 
@@ -46,7 +55,34 @@ namespace voidsoft.efbog
 		}
 
 
-		public static EntityProperty[] GetProperties(Type tp)
+		private Schema ReadEntityMetadata(Assembly asm)
+		{
+			Stream stream = null;
+
+			try
+			{
+				string[] resourceNames = asm.GetManifestResourceNames();
+
+				string name = resourceNames.FirstOrDefault(s => s.ToLower().EndsWith(".csdl"));
+
+				stream = asm.GetManifestResourceStream(name);
+
+				XmlSerializer xs = new XmlSerializer(typeof(Schema));
+
+				Schema schema = xs.Deserialize(stream) as Schema;
+
+				return schema;
+			}
+			finally
+			{
+				if (stream != null)
+				{
+					stream.Close();
+				}
+			}
+		}
+
+		public EntityProperty[] GetProperties(Type tp)
 		{
 			PropertyInfo[] properties = tp.GetProperties();
 
@@ -224,7 +260,7 @@ namespace voidsoft.efbog
 			return DbType.Object;
 		}
 
-		private static List<EntityRelationship> GetRelatedEntities(string entityName, List<EntityData> entities)
+		private  List<EntityRelationship> GetRelatedEntities(string entityName, List<EntityData> entities)
 		{
 			List<EntityRelationship> relations = new List<EntityRelationship>();
 

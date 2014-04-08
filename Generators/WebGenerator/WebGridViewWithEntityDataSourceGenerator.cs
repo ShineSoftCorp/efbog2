@@ -36,7 +36,7 @@ namespace voidsoft.Generators
 		{
 			StringBuilder b = new StringBuilder();
 
-			EntityProperty[] properties = EntityFrameworkTypeReflector.GetProperties(data.Entity);
+			EntityProperty[] properties = (new EntityFrameworkTypeReflector(context)).GetProperties(data.Entity);
 
 			string primaryKeyFieldName = EntityFrameworkTypeReflector.GetPrimaryKeyName(data.Entity);
 

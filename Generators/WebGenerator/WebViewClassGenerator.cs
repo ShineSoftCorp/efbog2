@@ -23,7 +23,7 @@ namespace voidsoft
 			{
 				try
 				{
-					properties = EntityFrameworkTypeReflector.GetProperties(t.Entity);
+					properties = (new EntityFrameworkTypeReflector(this.context)).GetProperties(t.Entity);
 					primaryKeyFieldName = EntityFrameworkTypeReflector.GetPrimaryKeyName(t.Entity);
 
 					string codeView = GenerateWebViewMarkup(t);

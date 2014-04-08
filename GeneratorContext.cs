@@ -14,5 +14,12 @@ namespace voidsoft.efbog
 		public Dictionary<string, string> DictionaryLookupDisplayNames = new Dictionary<string, string>();
 
 		public List<EntityData> Entities = new List<EntityData>();
+
+		public Schema DbContextSchema
+		{
+			get;
+			set;
+		}
+
 	}
 }
