@@ -1,7 +1,4 @@
-﻿using System.IO;
-using voidsoft.efbog;
-
-namespace voidsoft
+﻿namespace voidsoft.efbog
 {
 	public enum Mode
 	{

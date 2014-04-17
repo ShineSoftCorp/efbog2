@@ -17,12 +17,12 @@ namespace voidsoft.Generators
 
 		public void Generate()
 		{
-			foreach (EntityData t in context.Entities)
+			foreach (EntityDefinition t in context.Entities)
 			{
 				try
 				{
 					string codeView = GenerateMarkup(t);
-					GenerateFile(context.Path + @"\\output\views\" + t.Entity.Name + "ViewES.aspx", codeView);
+					GenerateFile(context.Path + @"\\output\views\" + t.Name + "ViewES.aspx", codeView);
 				}
 				catch (Exception e)
 				{
@@ -32,70 +32,70 @@ namespace voidsoft.Generators
 			}
 		}
 
-		private string GenerateMarkup(EntityData data)
+		private string GenerateMarkup(EntityDefinition definition)
 		{
 			StringBuilder b = new StringBuilder();
 
-			EntityProperty[] properties = (new EntityFrameworkTypeReflector(context)).GetProperties(data.Entity);
+			//EntityDefinitionProperty[] definitionProperties = (new EntityFrameworkTypeReflector(context)).GetProperties(definition.Entity);
 
-			string primaryKeyFieldName = EntityFrameworkTypeReflector.GetPrimaryKeyName(data.Entity);
+			//string primaryKeyFieldName = EntityFrameworkTypeReflector.GetPrimaryKeyName(definition.Entity);
 
-			b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Master.Master' AutoEventWireup='true' CodeBehind='" + data.Entity.Name + "View.aspx.cs' Inherits='" + context.UserSpecifiedNamespace + "." + data.Entity.Name + "View' %>");
+			//b.Append("<%@ Page Language='C#' MasterPageFile='~/MasterPages/Master.Master' AutoEventWireup='true' CodeBehind='" + definition.Entity.Name + "View.aspx.cs' Inherits='" + context.UserSpecifiedNamespace + "." + definition.Entity.Name + "View' %>");
 
-			b.Append(Environment.NewLine);
-			b.Append("<asp:Content ID='content' ContentPlaceHolderID='contentPlaceholder' runat='server'>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<asp:Content ID='content' ContentPlaceHolderID='contentPlaceholder' runat='server'>");
 
-			b.Append(" <table width='100%'>");
-			b.Append(Environment.NewLine);
-			b.Append("<tr> <td align='center'><h3>");
-			b.Append(data.Entity.Name + "</h3> </td></tr><tr>");
-			b.Append(Environment.NewLine);
-			b.Append("<td align='center'>");
-			b.Append(Environment.NewLine);
-			b.Append("<asp:GridView SkinID='gridViewSkin' OnRowCommand='gridView_RowCommand' ID='gridView' runat='server' AllowSorting='True' AllowPaging='True' AutoGenerateColumns='False' DataSourceID='entityDataSource" + data.Entity.Name + "'>");
-			b.Append(" <Columns>");
-			b.Append(Environment.NewLine);
-			b.Append("<asp:TemplateField ItemStyle-HorizontalAlign='Left'>");
-			b.Append(Environment.NewLine);
-			b.Append("<ItemTemplate>");
-			b.Append("<uc:ConfirmationButton ID='buttonDelete' CssClass='button' CommandArgument='<%# DataBinder.Eval(Container.DataItem, '" + data.PrimaryKeyFieldName + "') %>' Text='Delete' runat='server' RequiresConfirmation='true' CommandName='linkDelete' ConfirmationMessage='Are you sure you want to delete this ?' /> ");
-			b.Append("  </ItemTemplate></asp:TemplateField>");
+			//b.Append(" <table width='100%'>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<tr> <td align='center'><h3>");
+			//b.Append(definition.Entity.Name + "</h3> </td></tr><tr>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<td align='center'>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<asp:GridView SkinID='gridViewSkin' OnRowCommand='gridView_RowCommand' ID='gridView' runat='server' AllowSorting='True' AllowPaging='True' AutoGenerateColumns='False' DataSourceID='entityDataSource" + definition.Entity.Name + "'>");
+			//b.Append(" <Columns>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<asp:TemplateField ItemStyle-HorizontalAlign='Left'>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<ItemTemplate>");
+			//b.Append("<uc:ConfirmationButton ID='buttonDelete' CssClass='button' CommandArgument='<%# DataBinder.Eval(Container.DataItem, '" + definition.PrimaryKeyFieldName + "') %>' Text='Delete' runat='server' RequiresConfirmation='true' CommandName='linkDelete' ConfirmationMessage='Are you sure you want to delete this ?' /> ");
+			//b.Append("  </ItemTemplate></asp:TemplateField>");
 
-			foreach (var p in properties)
-			{
-				if (p.PropertyName != primaryKeyFieldName)
-				{
-					b.Append("<asp:BoundField DataField='" + p.PropertyName + "' HeaderText=" + p.PropertyName + "' ItemStyle-HorizontalAlign='Center' />");
-				}
-			}
+			//foreach (var p in definitionProperties)
+			//{
+			//	if (p.PropertyName != primaryKeyFieldName)
+			//	{
+			//		b.Append("<asp:BoundField DataField='" + p.PropertyName + "' HeaderText=" + p.PropertyName + "' ItemStyle-HorizontalAlign='Center' />");
+			//	}
+			//}
 
-			b.Append(" </Columns></asp:GridView>");
-			b.Append(Environment.NewLine);
-			b.Append("<asp:EntityDataSource ID=" + Constants.QUOTE + "entityDataSource" + data.Entity.Name + Constants.QUOTE + " runat='server' " + "ConnectionString=" + Constants.QUOTE + "name=" + context.ContextName + Constants.QUOTE + " DefaultContainerName='" + context.ContextName + "' " + " EntitySetName='" + data.Entity.Name + "' " + " Select='");
+			//b.Append(" </Columns></asp:GridView>");
+			//b.Append(Environment.NewLine);
+			//b.Append("<asp:EntityDataSource ID=" + Constants.QUOTE + "entityDataSource" + definition.Entity.Name + Constants.QUOTE + " runat='server' " + "ConnectionString=" + Constants.QUOTE + "name=" + context.ContextName + Constants.QUOTE + " DefaultContainerName='" + context.ContextName + "' " + " EntitySetName='" + definition.Entity.Name + "' " + " Select='");
 
-			//generate the select for entity data source
-			var builder = new StringBuilder();
+			////generate the select for entity definition source
+			//var builder = new StringBuilder();
 
-			for (int i = 0; i < properties.Length; i++)
-			{
-				builder.Append("it.[" + properties[i].PropertyName + "]" + (i != properties.Length - 1 ? "," : ""));
-			}
+			//for (int i = 0; i < definitionProperties.Length; i++)
+			//{
+			//	builder.Append("it.[" + definitionProperties[i].PropertyName + "]" + (i != definitionProperties.Length - 1 ? "," : ""));
+			//}
 
-			b.Append(builder + "' />");
-			b.Append(Environment.NewLine);
+			//b.Append(builder + "' />");
+			//b.Append(Environment.NewLine);
 
-			b.Append("    </td></tr><tr> <td align='center'>   <br /><br />");
-			b.Append(Environment.NewLine);
+			//b.Append("    </td></tr><tr> <td align='center'>   <br /><br />");
+			//b.Append(Environment.NewLine);
 
-			b.Append("<asp:Button runat='server' OnClick='buttonNew_Click' ID='buttonNew' Text='New' />");
-			b.Append(Environment.NewLine);
+			//b.Append("<asp:Button runat='server' OnClick='buttonNew_Click' ID='buttonNew' Text='New' />");
+			//b.Append(Environment.NewLine);
 
-			b.Append("  </td></tr></table></asp:Content>");
+			//b.Append("  </td></tr></table></asp:Content>");
 
 			return b.ToString();
 		}
 
-		private string GenerateWebViewCodeBehindClass(EntityData e)
+		private string GenerateWebViewCodeBehindClass(EntityDefinition e)
 		{
 			var b = new StringBuilder();
 
@@ -113,12 +113,12 @@ namespace voidsoft.Generators
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
-			b.Append("public partial class " + e.Entity.Name + "View : Page");
+			b.Append("public partial class " + e.Name + "View : Page");
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
 
-			b.Append("   private " + e.Entity.Name + "ViewPresentationService presenter = new " + e.Entity.Name + "ViewPresentationService();");
+			b.Append("   private " + e.Name + "ViewPresentationService presenter = new " + e.Name + "ViewPresentationService();");
 			b.Append(Environment.NewLine);
 			b.Append("protected void Page_Load(object sender, EventArgs e)");
 			b.Append(Environment.NewLine);
@@ -142,7 +142,7 @@ namespace voidsoft.Generators
 			b.Append("{");
 			b.Append(Environment.NewLine);
 
-			b.Append("        Response.Redirect(" + Constants.QUOTE + e.Entity.Name + "Edit.aspx?rid=" + Constants.QUOTE + " + id, true);");
+			b.Append("        Response.Redirect(" + Constants.QUOTE + e.Name + "Edit.aspx?rid=" + Constants.QUOTE + " + id, true);");
 			b.Append(Environment.NewLine);
 
 			b.Append("}");
@@ -178,7 +178,7 @@ namespace voidsoft.Generators
 			b.Append(Environment.NewLine);
 			b.Append("{");
 			b.Append(Environment.NewLine);
-			b.Append("    Response.Redirect(" + Constants.QUOTE + e.Entity.Name + "Edit.aspx" + Constants.QUOTE + ", true);");
+			b.Append("    Response.Redirect(" + Constants.QUOTE + e.Name + "Edit.aspx" + Constants.QUOTE + ", true);");
 			b.Append("}");
 
 			b.Append("}}");

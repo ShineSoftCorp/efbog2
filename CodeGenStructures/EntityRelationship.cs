@@ -1,4 +1,4 @@
-﻿namespace voidsoft
+﻿namespace voidsoft.efbog
 {
 	public enum RelationshipType
 	{

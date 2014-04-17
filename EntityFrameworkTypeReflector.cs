@@ -21,6 +21,7 @@ namespace voidsoft.efbog
 			context = c;
 		}
 
+		
 		public void ReflectAndGenerate(string assemblyPath)
 		{
 			Assembly assembly = Assembly.LoadFrom(assemblyPath);
@@ -35,13 +36,17 @@ namespace voidsoft.efbog
 				return;
 			}
 
-			GetEntities(types, assembly);
+			//GetEntities(types, assembly);
 
 			//get the resources
 
-			Schema sc = ReadEntityMetadata(assembly);
+			Schema sc = ReadEntityMetadataFromResourceFile(assembly);
 
 			context.DbContextSchema = sc;
+
+
+			(new CsdlTypeReflector()).CreateCodeGenStructure(context.DbContextSchema);
+
 
 			//load additional annotations
 			List<ColumnAnnotation> annotations = (new ColumnAnnotation(context)).ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
@@ -51,11 +56,19 @@ namespace voidsoft.efbog
 				context.Annotations = annotations;
 			}
 
+
+
+
+
 			StartGenerationProcess();
 		}
 
 
-		private Schema ReadEntityMetadata(Assembly asm)
+
+
+
+
+		private Schema ReadEntityMetadataFromResourceFile(Assembly asm)
 		{
 			Stream stream = null;
 
@@ -82,11 +95,11 @@ namespace voidsoft.efbog
 			}
 		}
 
-		public EntityProperty[] GetProperties(Type tp)
+		public EntityDefinitionProperty[] GetProperties(Type tp)
 		{
 			PropertyInfo[] properties = tp.GetProperties();
 
-			List<EntityProperty> listProperties = new List<EntityProperty>();
+			List<EntityDefinitionProperty> listProperties = new List<EntityDefinitionProperty>();
 
 			foreach (PropertyInfo info in properties)
 			{
@@ -94,7 +107,7 @@ namespace voidsoft.efbog
 
 				if (attributes.Length > 0)
 				{
-					listProperties.Add(new EntityProperty {IsNullable = attributes[0].IsNullable, PropertyName = info.Name, PropertyType = GetDbType(info.PropertyType), IsPrimaryKey = attributes[0].EntityKeyProperty});
+					listProperties.Add(new EntityDefinitionProperty {IsNullable = attributes[0].IsNullable, PropertyName = info.Name, PropertyType = (new Utils()).GetDbType(info.PropertyType), IsPrimaryKey = attributes[0].EntityKeyProperty});
 				}
 			}
 
@@ -123,69 +136,69 @@ namespace voidsoft.efbog
 			(new BusinessObjectGenerator(this.context)).Generate();
 
 			//generate WebViews
-			(new WebClassGenerator(this.context)).Generate();
+			//(new WebClassGenerator(this.context)).Generate();
 
 			//WebGridViewWithEntityDataSourceGenerator.Generate();
 		}
 
-		private void GetEntities(IEnumerable<Type> types, Assembly assembly)
-		{
-			//try to find the types by going over the DbContext porperties
-			Type type = assembly.GetType(context.EntitiesNamespaceName + "." + context.ContextName, true, true);
+		//private void GetEntities(IEnumerable<Type> types, Assembly assembly)
+		//{
+		//	//try to find the types by going over the DbContext porperties
+		//	Type type = assembly.GetType(context.EntitiesNamespaceName + "." + context.ContextName, true, true);
 
-			PropertyInfo[] properties = type.GetProperties();
+		//	PropertyInfo[] properties = type.GetProperties();
 
-			foreach (PropertyInfo property in properties)
-			{
-				Type t = property.PropertyType;
+		//	foreach (PropertyInfo property in properties)
+		//	{
+		//		Type t = property.PropertyType;
 
-				if (t.IsGenericType && t.GenericTypeArguments.Length > 0 )
-				{
-					string entityName = t.GenericTypeArguments[0].Name;
+		//		if (t.IsGenericType && t.GenericTypeArguments.Length > 0 )
+		//		{
+		//			string entityName = t.GenericTypeArguments[0].Name;
 
-				}
-			}
+		//		}
+		//	}
 
 
 
-			List<EntityData> listInitialPass = new List<EntityData>();
+		//	List<EntityDefinition> listInitialPass = new List<EntityDefinition>();
 
-			foreach (Type t in types)
-			{
-				if (t.IsSubclassOf(typeof (EntityObject)))
-				{
-					try
-					{
-						EntityData entityData = new EntityData();
-						entityData.Entity = t;
-						entityData.PrimaryKeyFieldName = GetPrimaryKeyName(t);
-						// entityData.Relationships = GetRelatedEntities(t.Name);
-						listInitialPass.Add(entityData);
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
-				}
-			}
+		//	foreach (Type t in types)
+		//	{
+		//		if (t.IsSubclassOf(typeof (EntityObject)))
+		//		{
+		//			try
+		//			{
+		//				EntityDefinition entityDefinition = new EntityDefinition();
+		//				entityDefinition.Entity = t;
+		//				entityDefinition.PrimaryKeyFieldName = GetPrimaryKeyName(t);
+		//				// entityData.Relationships = GetRelatedEntities(t.Name);
+		//				listInitialPass.Add(entityDefinition);
+		//			}
+		//			catch (Exception ex)
+		//			{
+		//				Console.WriteLine(ex.Message);
+		//			}
+		//		}
+		//	}
 
-			List<EntityData> listFinal = new List<EntityData>();
+		//	List<EntityDefinition> listFinal = new List<EntityDefinition>();
 
-			for (int i = 0; i < listInitialPass.Count; i++)
-			{
-				try
-				{
-					listFinal.Add(listInitialPass[i]);
-					listFinal[listFinal.Count - 1].Relationships = GetRelatedEntities(listInitialPass[i].Entity.Name, listInitialPass);
-				}
-				catch
-				{
-					continue;
-				}
-			}
+		//	for (int i = 0; i < listInitialPass.Count; i++)
+		//	{
+		//		try
+		//		{
+		//			listFinal.Add(listInitialPass[i]);
+		//			listFinal[listFinal.Count - 1].Relationships = GetRelatedEntities(listInitialPass[i].Name, listInitialPass);
+		//		}
+		//		catch
+		//		{
+		//			continue;
+		//		}
+		//	}
 
-			context.Entities = listFinal;
-		}
+		//	context.Entities = listFinal;
+		//}
 
 
 
@@ -217,68 +230,26 @@ namespace voidsoft.efbog
 			return true;
 		}
 
-		private static DbType GetDbType(Type t)
-		{
-			//check if it's nullable
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof (Nullable<>))
-			{
-				Type[] arguments = t.GetGenericArguments();
+		
+		//private  List<EntityRelationship> GetRelatedEntities(string entityName, List<EntityDefinition> entities)
+		//{
+		//	List<EntityRelationship> relations = new List<EntityRelationship>();
 
-				//get the underlying type
-				t = arguments[0];
-			}
+		//	foreach (EdmRelationshipAttribute a in relationshipAttributes)
+		//	{
+		//		if (a.Role1Name == entityName)
+		//		{
+		//			EntityDefinition related = entities.Find(e => e.Entity.Name == a.Role2Name);
+		//			relations.Add(new EntityRelationship(RelationshipType.Parent, a.Role2Name, related.PrimaryKeyFieldName));
+		//		}
+		//		else if (a.Role2Name == entityName)
+		//		{
+		//			EntityDefinition related = entities.Find(e => e.Entity.Name == a.Role1Name);
+		//			relations.Add(new EntityRelationship(RelationshipType.Child, a.Role1Name, related.PrimaryKeyFieldName));
+		//		}
+		//	}
 
-			if (t.FullName == "System.Int32")
-			{
-				return DbType.Int32;
-			}
-			else if (t.FullName == "System.Byte")
-			{
-				return DbType.Byte;
-			}
-			else if (t.FullName == "System.Int64")
-			{
-				return DbType.Int64;
-			}
-			else if (t.FullName == "System.Decimal")
-			{
-				return DbType.Decimal;
-			}
-			else if (t.FullName == "System.String")
-			{
-				return DbType.String;
-			}
-			else if (t.FullName == "System.DateTime")
-			{
-				return DbType.DateTime;
-			}
-			else if (t.FullName == "System.Boolean")
-			{
-				return DbType.Boolean;
-			}
-
-			return DbType.Object;
-		}
-
-		private  List<EntityRelationship> GetRelatedEntities(string entityName, List<EntityData> entities)
-		{
-			List<EntityRelationship> relations = new List<EntityRelationship>();
-
-			foreach (EdmRelationshipAttribute a in relationshipAttributes)
-			{
-				if (a.Role1Name == entityName)
-				{
-					EntityData related = entities.Find(e => e.Entity.Name == a.Role2Name);
-					relations.Add(new EntityRelationship(RelationshipType.Parent, a.Role2Name, related.PrimaryKeyFieldName));
-				}
-				else if (a.Role2Name == entityName)
-				{
-					EntityData related = entities.Find(e => e.Entity.Name == a.Role1Name);
-					relations.Add(new EntityRelationship(RelationshipType.Child, a.Role1Name, related.PrimaryKeyFieldName));
-				}
-			}
-
-			return relations;
-		}
+		//	return relations;
+		//}
 	}
 }

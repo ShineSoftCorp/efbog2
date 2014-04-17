@@ -30,9 +30,9 @@ namespace voidsoft
 			this.context = context;
 		}
 
-		public bool IsFileType(EntityData e, EntityProperty p)
+		public bool IsFileType(EntityDefinition e, EntityDefinitionProperty p)
 		{
-			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 
@@ -44,9 +44,9 @@ namespace voidsoft
 			return false;
 		}
 
-		public bool IsEnumType(EntityData e, EntityProperty p, ref Dictionary<int, string> values)
+		public bool IsEnumType(EntityDefinition e, EntityDefinitionProperty p, ref Dictionary<int, string> values)
 		{
-			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 
@@ -62,9 +62,9 @@ namespace voidsoft
 			return false;
 		}
 
-		public int GetFieldLength(EntityData e, EntityProperty p)
+		public int GetFieldLength(EntityDefinition e, EntityDefinitionProperty p)
 		{
-			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Entity.Name);
+			List<ColumnAnnotation> annotations = context.Annotations.FindAll(annotation => annotation.EntityName == e.Name);
 
 			ColumnAnnotation column = annotations.Find(a => a.PropertyName == p.PropertyName);
 

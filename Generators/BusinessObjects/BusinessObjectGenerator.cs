@@ -17,15 +17,15 @@ namespace voidsoft.efbog
 
 		public void Generate()
 		{
-			foreach (EntityData t in context.Entities)
+			foreach (EntityDefinition t in context.Entities)
 			{
 				try
 				{
 					string code = GenerateBusinessObject(t);
 
-					Console.WriteLine("Generated code for entity " + t.Entity.Name);
+					Console.WriteLine("Generated code for entity " + t.Name);
 
-					GenerateFile(context.Path + @"\output\BusinessObjects\" + t.Entity.Name + "BusinessObject.cs", code);
+					GenerateFile(context.Path + @"\output\BusinessObjects\" + t.Name + "BusinessObject.cs", code);
 				}
 				catch (Exception e)
 				{
@@ -61,7 +61,7 @@ namespace voidsoft.efbog
 			return "\"";
 		}
 
-		private string GenerateBusinessObject(EntityData t)
+		private string GenerateBusinessObject(EntityDefinition t)
 		{
 			StringBuilder builder = new StringBuilder();
 
@@ -77,7 +77,7 @@ namespace voidsoft.efbog
 			builder.Append("namespace " + context.UserSpecifiedNamespace + Environment.NewLine);
 			builder.Append("{" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
-			builder.Append("public class " + t.Entity.Name + "BusinessObject" + Environment.NewLine);
+			builder.Append("public class " + t.Name + "BusinessObject" + Environment.NewLine);
 			builder.Append("{" + Environment.NewLine);
 			//builder.Append("            private bool disposeContextAfterRunningQuery = false;" + Environment.NewLine);
 			builder.Append("            private " + context.ContextName + " context = null;   " + Environment.NewLine);
@@ -85,14 +85,14 @@ namespace voidsoft.efbog
 			builder.Append("" + Environment.NewLine);
 
 			//constructor
-			builder.Append("            public " + t.Entity.Name + "BusinessObject" + "(" + context.ContextName + " c)" + Environment.NewLine);
+			builder.Append("            public " + t.Name + "BusinessObject" + "(" + context.ContextName + " c)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                this.context = c; " + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("            " + Environment.NewLine);
 
 			//second constructor
-			builder.Append("            public " + t.Entity.Name + "BusinessObject" + "()" + Environment.NewLine);
+			builder.Append("            public " + t.Name + "BusinessObject" + "()" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                 context = GetContext();" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
@@ -110,15 +110,15 @@ namespace voidsoft.efbog
 			builder.Append("" + Environment.NewLine);
 
 			//add entity
-			builder.Append("            public void Create(" + t.Entity.Name + " entity)" + Environment.NewLine);
+			builder.Append("            public void Create(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                         context.AddTo" + t.Entity.Name + "(entity);" + Environment.NewLine);
+			builder.Append("                         context.AddTo" + t.Name + "(entity);" + Environment.NewLine);
 			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
 			//delete entity
-			builder.Append("            public void Delete(" + t.Entity.Name + " entity)" + Environment.NewLine);
+			builder.Append("            public void Delete(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                         context.DeleteObject(entity);" + Environment.NewLine);
 			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
@@ -128,7 +128,7 @@ namespace voidsoft.efbog
 			//delete by key
 			builder.Append("            public void Delete(int key)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                  " + t.Entity.Name + " entity =  Get" + t.Entity.Name + "(key);" + Environment.NewLine);
+			builder.Append("                  " + t.Name + " entity =  Get" + t.Name + "(key);" + Environment.NewLine);
 			builder.Append("                         if(entity == null)" + Environment.NewLine);
 			builder.Append("                         {" + Environment.NewLine);
 			builder.Append("                            throw new ArgumentException(" + GetEscapedQuote() + "Invalid key" + GetEscapedQuote() + ");" + Environment.NewLine);
@@ -144,19 +144,19 @@ namespace voidsoft.efbog
 			builder.Append("            }" + Environment.NewLine);
 
 			//get all entities
-			builder.Append("            public " + t.Entity.Name + "[] Get" + t.Entity.Name + "()" + Environment.NewLine);
+			builder.Append("            public " + t.Name + "[] Get" + t.Name + "()" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                var query = from currentEntity in context." + t.Entity.Name + " select currentEntity;" + Environment.NewLine);
-			builder.Append(t.Entity.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Entity.Name + ">(context, (ObjectQuery<" + t.Entity.Name + ">)query, false);" + Environment.NewLine);
+			builder.Append("                var query = from currentEntity in context." + t.Name + " select currentEntity;" + Environment.NewLine);
+			builder.Append(t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 			builder.Append("                 return entities;" + Environment.NewLine);
 			builder.Append("  }" + Environment.NewLine);
 
 			if (t.Relationships.Count > 0)
 			{
 				//get entity including
-				builder.Append("            public " + t.Entity.Name + "[] Get" + t.Entity.Name + "IncludingRelations()" + Environment.NewLine);
+				builder.Append("            public " + t.Name + "[] Get" + t.Name + "IncludingRelations()" + Environment.NewLine);
 				builder.Append("            {" + Environment.NewLine);
-				builder.Append("               var query = from entity in context." + t.Entity.Name);
+				builder.Append("               var query = from entity in context." + t.Name);
 
 				StringBuilder includeQueryBuilder = new StringBuilder();
 
@@ -169,7 +169,7 @@ namespace voidsoft.efbog
 
 				builder.Append(" select entity;" + Environment.NewLine);
 
-				builder.Append("             " + t.Entity.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Entity.Name + ">(context,(ObjectQuery<" + t.Entity.Name + ">)query, false);" + Environment.NewLine);
+				builder.Append("             " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context,(ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 
 				builder.Append("                return entities;" + Environment.NewLine);
 				builder.Append("            }" + Environment.NewLine);
@@ -188,11 +188,11 @@ namespace voidsoft.efbog
 			//builder.Append("            " + Environment.NewLine);
 
 			//private get entity by key
-			builder.Append("            public " + t.Entity.Name + " Get" + t.Entity.Name + "(int key)" + Environment.NewLine);
+			builder.Append("            public " + t.Name + " Get" + t.Name + "(int key)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
-			builder.Append("                var query = from currentEntity in context." + t.Entity.Name + " where currentEntity." + t.PrimaryKeyFieldName + " == key select currentEntity;" + Environment.NewLine);
-			builder.Append("            " + t.Entity.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Entity.Name + ">(context, (ObjectQuery<" + t.Entity.Name + ">)query, false);" + Environment.NewLine);
+			builder.Append("                var query = from currentEntity in context." + t.Name + " where currentEntity." + t.PrimaryKeyFieldName + " == key select currentEntity;" + Environment.NewLine);
+			builder.Append("            " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 			builder.Append("                if(entities.Length > 0)" + Environment.NewLine);
 			builder.Append("                {");
 			builder.Append("                     return entities[0]; " + Environment.NewLine);
@@ -201,32 +201,32 @@ namespace voidsoft.efbog
 			builder.Append("               return null;" + Environment.NewLine);
 			builder.Append("           }" + Environment.NewLine);
 
-			//get the lookup data field
-			PropertyInfo[] properties = t.Entity.GetProperties();
+			////get the lookup data field
+			//PropertyInfo[] properties = t.Entity.GetProperties();
 
-			string fieldName = null;
+			//string fieldName = null;
 
-			foreach (PropertyInfo info in properties)
-			{
-				bool result = info.PropertyType.ToString() == "System.String";
+			//foreach (PropertyInfo info in properties)
+			//{
+			//	bool result = info.PropertyType.ToString() == "System.String";
 
-				if (result)
-				{
-					fieldName = info.Name;
-					break;
-				}
-			}
+			//	if (result)
+			//	{
+			//		fieldName = info.Name;
+			//		break;
+			//	}
+			//}
 
-			if (!string.IsNullOrEmpty(fieldName))
-			{
-				//get lookup data
-				builder.Append("            public Dictionary<int,string> GetLookupData()" + Environment.NewLine);
-				builder.Append("            {" + Environment.NewLine);
-				builder.Append("                var query = from entity in context." + t.Entity.Name + " orderby entity." + fieldName + " ascending select new { entity." + t.PrimaryKeyFieldName + ", entity." + fieldName + " };" + Environment.NewLine);
-				builder.Append("                Dictionary<int,string> result = qr.GetLookupData<" + context.ContextName + ">(context, (ObjectQuery)query," + GetEscapedQuote() + t.PrimaryKeyFieldName + GetEscapedQuote() + "," + GetEscapedQuote() + fieldName + GetEscapedQuote() + ", false);" + Environment.NewLine);
-				builder.Append("                return result; " + Environment.NewLine);
-				builder.Append("            }");
-			}
+			//if (!string.IsNullOrEmpty(fieldName))
+			//{
+			//	//get lookup data
+			//	builder.Append("            public Dictionary<int,string> GetLookupData()" + Environment.NewLine);
+			//	builder.Append("            {" + Environment.NewLine);
+			//	builder.Append("                var query = from entity in context." + t.Entity.Name + " orderby entity." + fieldName + " ascending select new { entity." + t.PrimaryKeyFieldName + ", entity." + fieldName + " };" + Environment.NewLine);
+			//	builder.Append("                Dictionary<int,string> result = qr.GetLookupData<" + context.ContextName + ">(context, (ObjectQuery)query," + GetEscapedQuote() + t.PrimaryKeyFieldName + GetEscapedQuote() + "," + GetEscapedQuote() + fieldName + GetEscapedQuote() + ", false);" + Environment.NewLine);
+			//	builder.Append("                return result; " + Environment.NewLine);
+			//	builder.Append("            }");
+			//}
 
 			builder.Append("    }" + Environment.NewLine);
 			builder.Append("}" + Environment.NewLine);

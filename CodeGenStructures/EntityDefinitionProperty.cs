@@ -2,7 +2,7 @@
 
 namespace voidsoft.efbog
 {
-	public class EntityProperty
+	public class EntityDefinitionProperty
 	{
 		public bool IsNullable;
 		public bool IsPrimaryKey;
