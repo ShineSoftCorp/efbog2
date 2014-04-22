@@ -21,13 +21,15 @@ namespace voidsoft.efbog
 					dt.PrimaryKeyFieldName = sp.Key[0].Name;
 				}
 
+				dt.Name = sp.Name;
+
 				foreach (SchemaEntityTypeProperty typeProperty in sp.Property)
 				{
 					EntityDefinitionProperty ep = new EntityDefinitionProperty();
 					ep.IsNullable = Convert.ToBoolean(typeProperty.Nullable);
 					ep.IsPrimaryKey = dt.PrimaryKeyFieldName == typeProperty.Name;
 					ep.PropertyName = typeProperty.Name;
-					ep.PropertyType = u.GetDbType(Type.GetType(typeProperty.Type));
+					ep.PropertyType = u.GetDbType(Type.GetType("System." + typeProperty.Type));
 
 					dt.Fields.Add(ep);
 				}
@@ -40,6 +42,7 @@ namespace voidsoft.efbog
 		}
 
 
+		
 
 
 	}

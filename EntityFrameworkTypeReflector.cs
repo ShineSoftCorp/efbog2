@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects.DataClasses;
 using System.IO;
@@ -12,21 +11,19 @@ namespace voidsoft.efbog
 {
 	public class EntityFrameworkTypeReflector
 	{
-		private EdmRelationshipAttribute[] relationshipAttributes;
-
 		private GeneratorContext context;
+		private EdmRelationshipAttribute[] relationshipAttributes;
 
 		public EntityFrameworkTypeReflector(GeneratorContext c)
 		{
 			context = c;
 		}
 
-		
 		public void ReflectAndGenerate(string assemblyPath)
 		{
 			Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
-			relationshipAttributes = (EdmRelationshipAttribute[]) assembly.GetCustomAttributes(typeof (EdmRelationshipAttribute), false);
+			//relationshipAttributes = (EdmRelationshipAttribute[]) assembly.GetCustomAttributes(typeof (EdmRelationshipAttribute), false);
 
 			Type[] types = assembly.GetTypes();
 
@@ -36,37 +33,32 @@ namespace voidsoft.efbog
 				return;
 			}
 
-			//GetEntities(types, assembly);
-
-			//get the resources
-
-			Schema sc = ReadEntityMetadataFromResourceFile(assembly);
-
-			context.DbContextSchema = sc;
-
-
-			(new CsdlTypeReflector()).CreateCodeGenStructure(context.DbContextSchema);
-
-
-			//load additional annotations
-			List<ColumnAnnotation> annotations = (new ColumnAnnotation(context)).ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
-
-			if (annotations != null)
+			try
 			{
-				context.Annotations = annotations;
+				Schema sc = ReadEntityMetadataFromResourceFile(assembly);
+				context.DbContextSchema = sc;
+			}
+			catch
+			{
 			}
 
+			if (context.DbContextSchema != null)
+			{
+				List<EntityDefinition> entities = (new CsdlTypeReflector()).CreateCodeGenStructure(context.DbContextSchema);
 
+				context.Entities = entities;
+			}
 
+			////load additional annotations
+			//List<ColumnAnnotation> annotations = (new ColumnAnnotation(context)).ParseAnnotations(Environment.CurrentDirectory + @"\annotations.txt");
 
+			//if (annotations != null)
+			//{
+			//	context.Annotations = annotations;
+			//}
 
 			StartGenerationProcess();
 		}
-
-
-
-
-
 
 		private Schema ReadEntityMetadataFromResourceFile(Assembly asm)
 		{
@@ -80,7 +72,7 @@ namespace voidsoft.efbog
 
 				stream = asm.GetManifestResourceStream(name);
 
-				XmlSerializer xs = new XmlSerializer(typeof(Schema));
+				XmlSerializer xs = new XmlSerializer(typeof (Schema));
 
 				Schema schema = xs.Deserialize(stream) as Schema;
 
@@ -95,7 +87,7 @@ namespace voidsoft.efbog
 			}
 		}
 
-		public EntityDefinitionProperty[] GetProperties(Type tp)
+		private EntityDefinitionProperty[] GetProperties(Type tp)
 		{
 			PropertyInfo[] properties = tp.GetProperties();
 
@@ -114,26 +106,26 @@ namespace voidsoft.efbog
 			return listProperties.ToArray();
 		}
 
-		public static string GetPrimaryKeyName(Type tp)
-		{
-			PropertyInfo[] properties = tp.GetProperties();
+		//public static string GetPrimaryKeyName(Type tp)
+		//{
+		//	PropertyInfo[] properties = tp.GetProperties();
 
-			foreach (PropertyInfo info in properties)
-			{
-				EdmScalarPropertyAttribute[] attributes = (EdmScalarPropertyAttribute[]) info.GetCustomAttributes(typeof (EdmScalarPropertyAttribute), false);
+		//	foreach (PropertyInfo info in properties)
+		//	{
+		//		EdmScalarPropertyAttribute[] attributes = (EdmScalarPropertyAttribute[]) info.GetCustomAttributes(typeof (EdmScalarPropertyAttribute), false);
 
-				if (attributes[0].EntityKeyProperty)
-				{
-					return info.Name;
-				}
-			}
+		//		if (attributes[0].EntityKeyProperty)
+		//		{
+		//			return info.Name;
+		//		}
+		//	}
 
-			throw new ArgumentException("The primary key field can't be found for entity " + tp.Name);
-		}
+		//	throw new ArgumentException("The primary key field can't be found for entity " + tp.Name);
+		//}
 
 		private void StartGenerationProcess()
 		{
-			(new BusinessObjectGenerator(this.context)).Generate();
+			(new BusinessObjectGenerator(context)).Generate();
 
 			//generate WebViews
 			//(new WebClassGenerator(this.context)).Generate();
@@ -158,8 +150,6 @@ namespace voidsoft.efbog
 
 		//		}
 		//	}
-
-
 
 		//	List<EntityDefinition> listInitialPass = new List<EntityDefinition>();
 
@@ -200,8 +190,6 @@ namespace voidsoft.efbog
 		//	context.Entities = listFinal;
 		//}
 
-
-
 		private bool GetDbContext(Type[] types)
 		{
 			foreach (Type type in types)
@@ -230,7 +218,6 @@ namespace voidsoft.efbog
 			return true;
 		}
 
-		
 		//private  List<EntityRelationship> GetRelatedEntities(string entityName, List<EntityDefinition> entities)
 		//{
 		//	List<EntityRelationship> relations = new List<EntityRelationship>();
