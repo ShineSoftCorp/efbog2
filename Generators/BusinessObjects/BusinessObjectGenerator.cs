@@ -69,7 +69,9 @@ namespace voidsoft.efbog
 			builder.Append("using System.Linq;" + Environment.NewLine);
 			builder.Append("using " + context.EntitiesNamespaceName + ";" + Environment.NewLine);
 			builder.Append("using System.Collections.Generic;" + Environment.NewLine);
-			builder.Append("using System.Data.Objects;  " + Environment.NewLine);
+			builder.Append("using System.Data.Entity.Core.Objects;  " + Environment.NewLine);
+			builder.Append("using voidsoft.MicroRuntime.EntityFramework;  " + Environment.NewLine);
+
 			builder.Append("" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
@@ -112,7 +114,7 @@ namespace voidsoft.efbog
 			//add entity
 			builder.Append("            public void Create(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                         context.AddTo" + t.Name + "(entity);" + Environment.NewLine);
+			builder.Append("                         context." + t.Name + ".Add(entity);" + Environment.NewLine);
 			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
@@ -120,7 +122,7 @@ namespace voidsoft.efbog
 			//delete entity
 			builder.Append("            public void Delete(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                         context.DeleteObject(entity);" + Environment.NewLine);
+			builder.Append("                         context." + t.Name + ".Remove(entity);" + Environment.NewLine);
 			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
