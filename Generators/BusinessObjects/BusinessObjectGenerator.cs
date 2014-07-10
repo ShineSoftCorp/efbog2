@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace voidsoft.efbog
 {
 	public class BusinessObjectGenerator
 	{
-
 		private GeneratorContext context;
 
 		public BusinessObjectGenerator(GeneratorContext context)
@@ -30,7 +28,6 @@ namespace voidsoft.efbog
 				catch (Exception e)
 				{
 					Console.WriteLine(e.Message);
-					continue;
 				}
 			}
 		}
@@ -71,6 +68,7 @@ namespace voidsoft.efbog
 			builder.Append("using System.Collections.Generic;" + Environment.NewLine);
 			builder.Append("using System.Data.Entity.Core.Objects;  " + Environment.NewLine);
 			builder.Append("using voidsoft.MicroRuntime.EntityFramework;  " + Environment.NewLine);
+			builder.Append("using System.Data.Entity.Infrastructure;  " + Environment.NewLine);
 
 			builder.Append("" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
@@ -149,7 +147,7 @@ namespace voidsoft.efbog
 			builder.Append("            public " + t.Name + "[] Get" + t.Name + "()" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                var query = from currentEntity in context." + t.Name + " select currentEntity;" + Environment.NewLine);
-			builder.Append(t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
+			builder.Append(t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (DbQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 			builder.Append("                 return entities;" + Environment.NewLine);
 			builder.Append("  }" + Environment.NewLine);
 
@@ -171,7 +169,7 @@ namespace voidsoft.efbog
 
 				builder.Append(" select entity;" + Environment.NewLine);
 
-				builder.Append("             " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context,(ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
+				builder.Append("             " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context,(DbQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 
 				builder.Append("                return entities;" + Environment.NewLine);
 				builder.Append("            }" + Environment.NewLine);
@@ -194,7 +192,7 @@ namespace voidsoft.efbog
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 			builder.Append("                var query = from currentEntity in context." + t.Name + " where currentEntity." + t.PrimaryKeyFieldName + " == key select currentEntity;" + Environment.NewLine);
-			builder.Append("            " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (ObjectQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
+			builder.Append("            " + t.Name + "[] entities = qr.Execute<" + context.ContextName + "," + t.Name + ">(context, (DbQuery<" + t.Name + ">)query, false);" + Environment.NewLine);
 			builder.Append("                if(entities.Length > 0)" + Environment.NewLine);
 			builder.Append("                {");
 			builder.Append("                     return entities[0]; " + Environment.NewLine);
