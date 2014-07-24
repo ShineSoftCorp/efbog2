@@ -92,8 +92,6 @@
     <Compile Include="CodeGenStructures\EntityDefinition.cs" />
     <Compile Include="EntityFrameworkTypeReflector.cs" />
     <Compile Include="GeneratorContext.cs" />
-    <Compile Include="Generators\WebGenerator\WebEditClassGenerator.cs" />
-    <Compile Include="Generators\WebGenerator\WebGridViewWithEntityDataSourceGenerator.cs" />
     <Compile Include="OptionLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,7 +119,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Generators\WebGenerator\WebViewClassGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

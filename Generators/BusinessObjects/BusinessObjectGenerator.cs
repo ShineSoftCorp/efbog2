@@ -82,12 +82,14 @@ namespace voidsoft.efbog
 			//builder.Append("            private bool disposeContextAfterRunningQuery = false;" + Environment.NewLine);
 			builder.Append("            private " + context.ContextName + " context = null;   " + Environment.NewLine);
 			builder.Append("            QueryRunner qr = new QueryRunner();" + Environment.NewLine);
+			builder.Append("            private bool hasAttachedContext;" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
 			//constructor
 			builder.Append("            public " + t.Name + "BusinessObject" + "(" + context.ContextName + " c)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                this.context = c; " + Environment.NewLine);
+			builder.Append("                hasAttachedContext = true;" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("            " + Environment.NewLine);
 
@@ -113,15 +115,21 @@ namespace voidsoft.efbog
 			builder.Append("            public void Create(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                         context." + t.Name + ".Add(entity);" + Environment.NewLine);
-			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
-			builder.Append("            }" + Environment.NewLine);
+			builder.Append("					     if(! hasAttachedContext)" + Environment.NewLine);
+			builder.Append("			             {" + Environment.NewLine);
+			builder.Append("			  			    context.SaveChanges();" + Environment.NewLine);
+			builder.Append("						 }" + Environment.NewLine);
+			builder.Append("			}" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
 			//delete entity
 			builder.Append("            public void Delete(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
 			builder.Append("                         context." + t.Name + ".Remove(entity);" + Environment.NewLine);
-			builder.Append("                         context.SaveChanges();" + Environment.NewLine);
+			builder.Append("					     if(! hasAttachedContext)" + Environment.NewLine);
+			builder.Append("			             {" + Environment.NewLine);
+			builder.Append("			  			    context.SaveChanges();" + Environment.NewLine);
+			builder.Append("						 }" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
