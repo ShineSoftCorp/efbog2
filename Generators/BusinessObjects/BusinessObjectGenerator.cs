@@ -100,6 +100,15 @@ namespace voidsoft.efbog
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
+
+			builder.Append("            public bool DisableLazyLoading " + Environment.NewLine);
+			builder.Append("            {" + Environment.NewLine);
+			builder.Append("                 get;" + Environment.NewLine);
+			builder.Append("                 set;" + Environment.NewLine);
+			builder.Append("            }" + Environment.NewLine);
+			builder.Append("" + Environment.NewLine);
+
+
 			//get context
 			builder.Append("            private " + context.ContextName + " GetContext()" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
@@ -107,7 +116,9 @@ namespace voidsoft.efbog
 			builder.Append("                        {" + Environment.NewLine);
 			builder.Append("                            return context;" + Environment.NewLine);
 			builder.Append("                        }" + Environment.NewLine);
-			builder.Append("                        return Activator.CreateInstance<" + context.ContextName + ">();" + Environment.NewLine);
+			builder.Append(                        context.ContextName + " c = Activator.CreateInstance<" + context.ContextName + ">();" + Environment.NewLine);
+			builder.Append("					   c.Configuration.LazyLoadingEnabled = !DisableLazyLoading;" + Environment.NewLine);
+			builder.Append("                       return c;" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
