@@ -133,6 +133,16 @@ namespace voidsoft.efbog
 			builder.Append("			}" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
+
+			//predicate based find  method
+			builder.Append("            public IQueryable<" + t.Name + "> Find(Expression<Func<" + t.Name + ", bool>> predicate)" + Environment.NewLine);
+			builder.Append("            {" + Environment.NewLine);
+			builder.Append("                         context." + t.Name + ".Where(predicate);" + Environment.NewLine);
+			builder.Append("			}" + Environment.NewLine);
+			builder.Append("" + Environment.NewLine);
+
+
+
 			//delete entity
 			builder.Append("            public void Delete(" + t.Name + " entity)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
