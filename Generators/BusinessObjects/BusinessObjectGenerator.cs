@@ -137,7 +137,7 @@ namespace voidsoft.efbog
 			//predicate based find  method
 			builder.Append("            public IQueryable<" + t.Name + "> Find(Expression<Func<" + t.Name + ", bool>> predicate)" + Environment.NewLine);
 			builder.Append("            {" + Environment.NewLine);
-			builder.Append("                         context." + t.Name + ".Where(predicate);" + Environment.NewLine);
+			builder.Append("                   return context." + t.Name + ".Where(predicate);" + Environment.NewLine);
 			builder.Append("			}" + Environment.NewLine);
 			builder.Append("" + Environment.NewLine);
 
