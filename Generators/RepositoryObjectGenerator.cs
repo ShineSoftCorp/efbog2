@@ -23,7 +23,7 @@ namespace voidsoft.efbog
 
 					Console.WriteLine("Generated code for entity " + t.Name);
 
-					GenerateFile(context.Path + @"\output\BusinessObjects\" + t.Name + "BusinessObject.cs", code);
+					GenerateFile(context.Path + @"\output\RepositoryObjects\" + t.Name + "Repository.cs", code);
 				}
 				catch (Exception e)
 				{
@@ -32,11 +32,8 @@ namespace voidsoft.efbog
 			}
 		}
 
-		private static void GenerateFile(string filePath, string content)
+		private void GenerateFile(string filePath, string content)
 		{
-			FileStream fs = null;
-			StreamWriter writer = null;
-
 			try
 			{
 				if (File.Exists(filePath))
@@ -53,7 +50,7 @@ namespace voidsoft.efbog
 			}
 		}
 
-		private static string GetEscapedQuote()
+		private string GetEscapedQuote()
 		{
 			return "\"";
 		}
@@ -67,7 +64,6 @@ namespace voidsoft.efbog
 			builder.Append("using " + context.EntitiesNamespaceName + ";" + Environment.NewLine);
 			builder.Append("using System.Collections.Generic;" + Environment.NewLine);
 			builder.Append("using System.Data.Entity.Core.Objects;  " + Environment.NewLine);
-			builder.Append("using voidsoft.MicroRuntime.EntityFramework;  " + Environment.NewLine);
 			builder.Append("using System.Data.Entity.Infrastructure;  " + Environment.NewLine);
 
 			builder.Append("" + Environment.NewLine);
@@ -116,7 +112,7 @@ namespace voidsoft.efbog
 			builder.Append("                        {" + Environment.NewLine);
 			builder.Append("                            return context;" + Environment.NewLine);
 			builder.Append("                        }" + Environment.NewLine);
-			builder.Append(                        context.ContextName + " c = Activator.CreateInstance<" + context.ContextName + ">();" + Environment.NewLine);
+			builder.Append(context.ContextName + " c = Activator.CreateInstance<" + context.ContextName + ">();" + Environment.NewLine);
 			builder.Append("					   c.Configuration.LazyLoadingEnabled = !DisableLazyLoading;" + Environment.NewLine);
 			builder.Append("                       return c;" + Environment.NewLine);
 			builder.Append("            }" + Environment.NewLine);

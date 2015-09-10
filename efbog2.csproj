@@ -88,7 +88,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="CodeGenStructures\EntityDefinitionProperty.cs" />
     <Compile Include="CodeGenStructures\EntityRelationship.cs" />
-    <Compile Include="Generators\BusinessObjects\BusinessObjectGenerator.cs" />
+    <Compile Include="Generators\RepositoryObjectGenerator.cs" />
     <Compile Include="CodeGenStructures\EntityDefinition.cs" />
     <Compile Include="EntityFrameworkTypeReflector.cs" />
     <Compile Include="GeneratorContext.cs" />
